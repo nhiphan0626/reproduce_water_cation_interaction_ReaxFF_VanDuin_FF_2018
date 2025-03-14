@@ -1,0 +1,19 @@
+# created by fftool
+tolerance 2.5
+filetype xyz
+output simbox.xyz
+
+structure spc_pack.xyz
+  number 782
+  inside box -12.9500 -12.9500 -12.9500 12.9500 12.9500 12.9500
+end structure
+
+structure Cs_pack.xyz
+  number 10
+  inside box -12.9500 -12.9500 -12.9500 12.9500 12.9500 12.9500
+end structure
+
+structure OH_pack.xyz
+  number 10
+  inside box -12.9500 -12.9500 -12.9500 12.9500 12.9500 12.9500
+end structure

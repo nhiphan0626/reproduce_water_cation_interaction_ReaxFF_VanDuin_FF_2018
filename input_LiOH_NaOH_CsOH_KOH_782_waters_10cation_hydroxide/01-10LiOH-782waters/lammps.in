@@ -1,0 +1,115 @@
+#----Variable section----#
+units                   real
+boundary                p p p
+special_bonds           lj/coul 1.0 1.0 1.0
+atom_style              full
+bond_style              harmonic
+angle_style             harmonic
+read_data               data.lmp
+timestep                0.25
+pair_style    		reaxff NULL lgvdw no safezone 2.0 mincap 100
+pair_coeff   		* * ffield.reaxff H  O  Li  O  H
+
+bond_coeff      	1 0.00 0.95720
+bond_coeff      	2 0.00 0.95720
+angle_coeff     	1 0.00 104.52
+
+fix 		qeqfix all qeq/reaxff 1 0.0 10.0 1.0e-6 reaxff 
+variable        myDensity    equal  1.000
+
+variable        sname index watbox
+variable        targetP equal 1.0 
+variable        targetT1 equal 300
+
+###################################################
+#compute                 pqeq all pair coul/pqeqgauss
+compute                 reax all pair reaxff
+variable eb             equal c_reax[1]
+variable ea             equal c_reax[2]
+variable elp    equal c_reax[3]
+variable emol   equal c_reax[4]
+variable ev             equal c_reax[5]
+variable epen   equal c_reax[6]
+variable ecoa   equal c_reax[7]
+variable ehb    equal c_reax[8]
+variable et             equal c_reax[9]
+variable eco    equal c_reax[10]
+variable ew             equal c_reax[11]
+variable ep             equal c_reax[12]
+variable efi    equal c_reax[13]
+variable eqeq   equal c_reax[14]
+variable epqeq  equal c_pqeq
+
+
+fix                  OHfixed all shake 0.001 20 0 b 1 a 1
+fix                  Momt all momentum 1 linear 1 1 1 angular
+
+print                          .
+print =====================================
+print "NVT at 10K "
+print =====================================
+print            .
+
+log             ${sname}.10K.eng
+thermo          1
+dump            1 all custom 1000 ${sname}.10K.lammps id type xu yu zu vx vy vz mol  q
+thermo_style    custom step temp etotal pe ke v_eb v_ew v_ehb v_elp v_ev v_eqeq press pxx pyy pzz pxy pxz pyz
+velocity        all create 10.0 12345678 dist uniform
+fix             1 all nvt temp  10.0 10.0 100.0
+run             1000
+unfix           1
+undump          1
+
+print                          .
+print =====================================
+print "Heat to ${targetT1} K"
+print =====================================
+print            .
+
+log             ${sname}.heatTo${targetT1}K.eng
+thermo          100
+dump            1 all custom 100 ${sname}.heatTo${targetT1}K.lammps id type xu yu zu vx vy vz mol q
+thermo_style    custom step temp etotal pe ke v_eb v_ew v_ehb v_elp v_ev v_eqeq press pxx pyy pzz pxy pxz pyz
+fix             1 all nvt temp  10.0 ${targetT1}  100.0
+run             10000
+unfix           1
+undump          1
+
+print                          .
+print =====================================
+print "NVT at ${targetT1} K"
+print =====================================
+print            .
+
+log             ${sname}.relax${targetT1}K.eng
+thermo          100
+dump            1 all custom 100 ${sname}.relax${targetT1}K.lammps id type xu yu zu vx vy vz mol  q
+thermo_style    custom step temp etotal pe ke v_eb v_ew v_ehb v_elp v_ev v_eqeq press pxx pyy pzz pxy pxz pyz
+fix             1 all nvt temp ${targetT1} ${targetT1} 100.0
+run             500000
+unfix           1
+undump          1
+write_restart restart.relax${targetT1}K
+
+
+unfix           OHfixed
+timestep        0.1
+
+
+print                          .
+print =====================================
+print "NVT at  ${targetT1} K"
+print =====================================
+print            .
+
+log             ${sname}.NVT${targetT1}K.eng
+thermo          1
+dump            1 all custom 500 ${sname}.NVT${targetT1}K.lammps id type xu yu zu vx vy vz mol q
+thermo_style    custom step temp etotal pe ke v_eb v_ew v_ehb v_elp v_ev v_eqeq press pxx pyy pzz pxy pxz pyz
+fix             1 all nvt temp ${targetT1} ${targetT1} 100.0
+run             5000000
+unfix           1
+undump          1
+write_restart restart.NVT${targetT1}K
+
+
