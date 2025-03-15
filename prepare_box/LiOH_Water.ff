@@ -1,0 +1,21 @@
+ATOMS
+#     typ   m/u     q/e    pot   pars
+# SPCE model
+Ow    Ow   15.999  0     lj      0.0000 0.0000
+Hw    Hw    1.008  0     lj      0.0000 0.0000
+# lithium cation Aqvist
+Li    Li    6.941  0     lj      0.0000 0.0000
+ 
+#OH
+O   O   15.999  0     lj         0.0000 0.0000
+H   H   1.008   0     lj         0.0000 0.0000
+
+BONDS
+# i j    pot    re/A    kr/kJmol-1
+# SPCE model
+Ow  Hw   cons   1.000   3450.0
+O   H    cons   1.000   3450.0
+
+ANGLES
+# i  j  k    pot    th/deg   ka/kjmol-1
+Hw  Ow  Hw   cons   109.47   317.57
